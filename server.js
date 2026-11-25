@@ -30,24 +30,10 @@ app.get("/", (req, res) => {
 });
 
 // Test User Model
-app.get("/test-user", async (req, res) => {
-  try {
-    const testUser = await User.create({
-      name: "Test User",
-      email: "testuser@example.com",
-      password: "temporary_test_password",
-    });
-
-    res.status(201).json({
-      message: "User model is working!",
-      user: testUser,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "User model test failed",
-      error: error.message,
-    });
-  }
+app.get("/api/bookmarks/test", (req, res) => {
+  res.status(200).json({
+    message: "Bookmark route is working!"
+  });
 });
 
 // Connect to MongoDB and start server
