@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import generateToken from "../utils/auth.js";
+import passport from "../config/passport.js";
 
 const router = express.Router();
 
@@ -142,5 +143,56 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+// ========================================
+// GITHUB OAUTH LOGIN
+// GET /api/users/auth/github
+// ========================================
+router.get(
+  "/auth/github",
+  passport.authenticate("github", {
+    scope: ["user:email"],
+    session: false,
+  })
+);
+
+// ========================================
+// GITHUB OAUTH CALLBACK
+// GET /api/users/auth/github/callback
+// ========================================
+router.get(
+  "/auth/github/callback",
+  passport.authenticate("github", {
+    session: false,
+    failureRedirect: "/",
+  }),
+  (req, res) => {
+    try {
+      // Get the authenticated user from Passport
+      const user = req.user;
+
+      // Generate a JWT token for the GitHub user
+      const token = generateToken(user._id);
+
+      // Return the token and safe user information
+      res.status(200).json({
+        message: "GitHub login successful.",
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      });
+
+    } catch (error) {
+      console.error("GitHub login error:", error);
+
+      res.status(500).json({
+        message: "GitHub authentication failed.",
+      });
+    }
+  }
+);
 // Export the router so server.js can use these routes
 export default router;
