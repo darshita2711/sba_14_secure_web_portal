@@ -10,6 +10,7 @@ import User from "./models/User.js";
 
 // Import user authentication routes
 import userRoutes from "./routes/userRoutes.js";
+import bookmarkRoutes from "./routes/bookmarkRoutes.js"
 // Create Express app
 const app = express();
 
@@ -17,6 +18,8 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
+
+app.use("/api/bookmarks", bookmarkRoutes);
 
 // Initialize Passport
 app.use(passport.initialize());
