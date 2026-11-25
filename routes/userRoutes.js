@@ -67,5 +67,80 @@ router.post("/register", async (req, res) => {
     });
   }
 });
+
+// ========================================
+// USER LOGIN
+// POST /api/users/login
+// ========================================
+router.post("/login", async (req, res) => {
+  try {
+    // Get email and password from the request body
+    const { email, password } = req.body;
+
+    // Check that both fields are provided
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Please provide email and password.",
+      });
+    }
+
+    // Find the user by email
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const user = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    // Check whether the user exists
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password.",
+      });
+    }
+
+    // Check whether this account has a local password
+    // GitHub-only accounts may not have a password
+    if (!user.password) {
+      return res.status(401).json({
+        message: "Please log in using GitHub.",
+      });
+    }
+
+    // Compare the entered password with the hashed password
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    // Reject login if the password does not match
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        message: "Invalid email or password.",
+      });
+    }
+
+    // Generate a JWT token after successful login
+    const token = generateToken(user._id);
+
+    // Return the token and safe user details
+    return res.status(200).json({
+      message: "Login successful.",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+
+    return res.status(500).json({
+      message: "Server error during login.",
+    });
+  }
+});
+
 // Export the router so server.js can use these routes
 export default router;
