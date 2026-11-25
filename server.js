@@ -7,11 +7,16 @@ import connectDB from "./config/db.js";
 import passport from "./config/passport.js";
 
 import User from "./models/User.js";
+
+// Import user authentication routes
+import userRoutes from "./routes/userRoutes.js";
 // Create Express app
 const app = express();
 
 // Middleware to read JSON data
 app.use(express.json());
+
+app.use("/api/users", userRoutes);
 
 // Initialize Passport
 app.use(passport.initialize());
