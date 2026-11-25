@@ -3,11 +3,18 @@ import "dotenv/config";
 
 import express from "express";
 import connectDB from "./config/db.js";
+// Import Passport configuration
+import passport from "./config/passport.js";
 
 import User from "./models/User.js";
 // Create Express app
 const app = express();
 
+// Middleware to read JSON data
+app.use(express.json());
+
+// Initialize Passport
+app.use(passport.initialize());
 
 // Test route
 app.get("/", (req, res) => {
